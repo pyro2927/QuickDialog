@@ -68,7 +68,9 @@
 	__weak QMultilineTextViewController *weakTextController = textController;
     textController.willDisappearCallback = ^ {
         weakSelf.textValue = weakTextController.textView.text;
-        [[tableView cellForElement:weakSelf] setNeedsDisplay];
+        QEntryTableViewCell *cell = (QEntryTableViewCell*)[tableView cellForElement:weakSelf];
+        [cell.textField setText:weakSelf.textValue];
+        [cell setNeedsDisplay];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     };
     [controller displayViewControllerInPopover:textController withNavigation:NO];
