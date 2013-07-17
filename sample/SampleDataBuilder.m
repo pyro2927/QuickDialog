@@ -171,6 +171,8 @@
     controls.footer = @"More controls will be added.";
     [controls addElement:element1];
 
+    [controls addElement:[[QImageElement alloc] initWithTitle:@"Image" Value:nil]];
+    
     [controls addElement:radioElement];
     [controls addElement:entryElement];
     [controls addElement:autoElement];

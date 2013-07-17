@@ -48,7 +48,6 @@
         self.title = aTitle;
         self.imageValue = anImage;
         self.imageMaxLength = FLT_MAX;
-        _source = UIImagePickerControllerSourceTypePhotoLibrary;
     }
     return self;
 }
@@ -82,14 +81,14 @@
 	[obj setValue:self.imageValue forKey:_key];
 }
 
-- (void)presentImagePicker:(QuickDialogTableView *)tableView controller:(QuickDialogController *)controller path:(NSIndexPath *)path {
-    if ([UIImagePickerController isSourceTypeAvailable:_source]) {
-        self.imagePickerController.sourceType = _source;
+- (void)presentImagePickerForSource:(UIImagePickerControllerSourceType)source tableView:(QuickDialogTableView *)tableView controller:(QuickDialogController *)controller path:(NSIndexPath *)path {
+    if ([UIImagePickerController isSourceTypeAvailable:source]) {
+        self.imagePickerController.sourceType = source;
     } else {
         NSLog(@"Source not available, using default Library type.");
         self.imagePickerController.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     }
-
+    
     BOOL isPhone = [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone;
     if (isPhone) {
         [controller displayViewController:self.imagePickerController];
@@ -97,7 +96,7 @@
         UITableViewCell *tableViewCell = [tableView cellForRowAtIndexPath:path];
         if ([tableViewCell isKindOfClass:[QImageTableViewCell class]]) {
             UIView *presentingView = ((QImageTableViewCell *) tableViewCell).imageViewButton;
-
+            
             UIPopoverController *aPopoverController = [[UIPopoverController alloc] initWithContentViewController:self.imagePickerController];
             [aPopoverController presentPopoverFromRect:presentingView.bounds
                                                 inView:presentingView
@@ -105,6 +104,18 @@
             aPopoverController.delegate = self;
             self.popoverController = aPopoverController;
         }
+    }
+}
+
+- (void)presentImagePicker:(QuickDialogTableView *)tableView controller:(QuickDialogController *)controller path:(NSIndexPath *)path {
+    //NEW CODE
+    if ([UIImagePickerController isCameraDeviceAvailable:UIImagePickerControllerCameraDeviceRear]) {
+        parentController = controller;
+        tappedIndexPath = path;
+        tappedTableView = tableView;
+        [[[UIActionSheet alloc] initWithTitle:@"Source?" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Camera", @"Photo Library", nil] showInView:[[[[UIApplication sharedApplication] keyWindow] rootViewController] view]];
+    } else {
+        [self presentImagePickerForSource:UIImagePickerControllerSourceTypePhotoLibrary tableView:tableView controller:controller path:path];
     }
 }
 
@@ -157,6 +168,26 @@
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
     self.popoverController = nil;
+}
+
+#pragma mark -
+#pragma mark UIActionSheetDelegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex{
+    if (buttonIndex == actionSheet.cancelButtonIndex)
+        return;
+    
+    switch (buttonIndex) {
+        case 0:
+            _source = UIImagePickerControllerSourceTypeCamera;
+            break;
+        case 1:
+            _source = UIImagePickerControllerSourceTypePhotoLibrary;
+            break;
+        default:
+            break;
+    }
+    [self presentImagePickerForSource:_source tableView:tappedTableView controller:parentController path:tappedIndexPath];
 }
 
 @end

@@ -17,7 +17,11 @@
 #import <UIKit/UIKit.h>
 #import "QRootElement.h"
 
-@interface QImageElement : QEntryElement
+@interface QImageElement : QEntryElement <UIActionSheetDelegate> {
+    QuickDialogController *parentController;
+    QuickDialogTableView *tappedTableView;
+    NSIndexPath *tappedIndexPath;
+}
 
 @property (nonatomic, strong) UIImage *imageValue;
 @property (nonatomic, strong) NSString *imageValueNamed;

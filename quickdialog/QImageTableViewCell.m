@@ -45,17 +45,13 @@ static NSString *kDetailImageValueObservanceContext = @"imageValue";
     _imageViewButton.contentMode = UIViewContentModeScaleAspectFill;
     _imageViewButton.backgroundColor = [UIColor colorWithWhite:0.1 alpha:0.1];
     _imageViewButton.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth);
-    [_imageViewButton addTarget:self action:@selector(handleImageSelected) forControlEvents:UIControlEventTouchUpInside];
+    [_imageViewButton setUserInteractionEnabled:NO]; // don't intercept touches
     [self.contentView addSubview:_imageViewButton];
     [self setNeedsLayout];
 }
 
 - (void)handleImageSelected {
-    if (((QImageElement *)_entryElement).imageValue!=nil){
-
-    } else{
-
-    }
+    [self setSelected:YES animated:YES];
 }
 
 - (void)prepareForElement:(QEntryElement *)element inTableView:(QuickDialogTableView *)tableView {
